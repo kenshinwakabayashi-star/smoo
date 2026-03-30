@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* smoo color palette */
+    --background: 48 24% 96%;          /* #f7f6f2 */
+    --foreground: 60 4% 11%;           /* #1c1c1a */
+    --card: 0 0% 100%;
+    --card-foreground: 60 4% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 60 4% 11%;
+    --primary: 150 55% 23%;            /* #1a5c3a */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 138 23% 81%;          /* #c2dccb */
+    --secondary-foreground: 150 55% 23%;
+    --muted: 48 15% 93%;
+    --muted-foreground: 150 8% 45%;
+    --accent: 160 51% 58%;             /* #5dcaa5 */
+    --accent-foreground: 150 55% 23%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 140 15% 87%;
+    --input: 140 15% 87%;
+    --ring: 150 55% 23%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+
+  ::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-border rounded-full;
+  }
+}
+
+@layer components {
+  .app-container {
+    @apply mx-auto w-full max-w-[390px] px-4;
+  }
+
+  .card-base {
+    @apply bg-card rounded-xl border border-border/50 shadow-sm;
+  }
+}
