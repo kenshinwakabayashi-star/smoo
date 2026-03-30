@@ -1,16 +1,64 @@
-import { BarChart2 } from 'lucide-react'
+import { redirect } from 'next/navigation'
+import { createClient } from '@/lib/supabase/server'
+import ReportsView from './reports-view'
+import { getCurrentMonthKey, getMonthRange, getPrevMonth } from '@/lib/utils'
 
-export default function ReportsPage() {
+export default async function ReportsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ month?: string }>
+}) {
+  const supabase = await createClient()
+  const params = await searchParams
+
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/auth')
+
+  const { data: profile } = await supabase
+    .from('user_profiles')
+    .select('id, display_name, household_id, created_at')
+    .eq('id', user.id)
+    .single()
+
+  if (!profile?.household_id) redirect('/setup')
+
+  const householdId = profile.household_id
+  const monthKey = params.month ?? getCurrentMonthKey()
+
+  // Build 6-month range
+  const months: string[] = []
+  let mk = monthKey
+  for (let i = 0; i < 6; i++) {
+    months.unshift(mk)
+    mk = getPrevMonth(mk)
+  }
+  const oldest = getMonthRange(months[0]).start
+  const newest = getMonthRange(monthKey).end
+
+  const [{ data: transactions }, { data: categories }, { data: members }] = await Promise.all([
+    supabase
+      .from('transactions')
+      .select('*')
+      .eq('household_id', householdId)
+      .gte('date', oldest)
+      .lte('date', newest),
+    supabase
+      .from('categories')
+      .select('id, household_id, name, icon, color, is_default')
+      .eq('household_id', householdId),
+    supabase
+      .from('user_profiles')
+      .select('id, display_name, household_id, created_at')
+      .eq('household_id', householdId),
+  ])
+
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-background pb-20 px-4">
-      <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary/10 mb-4">
-        <BarChart2 className="h-8 w-8 text-primary" />
-      </div>
-      <h1 className="text-lg font-semibold">レポート</h1>
-      <p className="mt-2 text-sm text-muted-foreground text-center">
-        カテゴリ別・月別の支出グラフを確認できます
-      </p>
-      <p className="mt-1 text-xs text-muted-foreground/60">近日公開予定</p>
-    </div>
+    <ReportsView
+      transactions={transactions ?? []}
+      categories={categories ?? []}
+      members={members ?? []}
+      monthKey={monthKey}
+      months={months}
+    />
   )
 }
