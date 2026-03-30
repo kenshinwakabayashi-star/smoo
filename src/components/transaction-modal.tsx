@@ -140,14 +140,14 @@ export default function TransactionModal({
       />
 
       {/* Bottom sheet */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 mx-auto max-w-[390px] rounded-t-2xl bg-white pb-safe shadow-xl animate-in slide-in-from-bottom duration-300">
+      <div className="fixed bottom-0 left-0 right-0 z-50 mx-auto flex max-h-[90vh] max-w-[390px] flex-col rounded-t-2xl bg-white shadow-xl animate-in slide-in-from-bottom duration-300">
         {/* Drag handle */}
-        <div className="flex justify-center pt-3 pb-1">
+        <div className="flex flex-shrink-0 justify-center pt-3 pb-1">
           <div className="h-1 w-10 rounded-full bg-muted" />
         </div>
 
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3">
+        <div className="flex flex-shrink-0 items-center justify-between px-5 py-3">
           <h2 className="text-base font-semibold">
             {editTransaction ? '取引を編集' : '取引を追加'}
           </h2>
@@ -159,7 +159,8 @@ export default function TransactionModal({
           </button>
         </div>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 px-5 pb-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col overflow-hidden">
+        <div className="flex-1 space-y-4 overflow-y-auto px-5 pb-2">
           {/* Type toggle */}
           <div className="flex rounded-xl bg-muted p-1 gap-1">
             {(['expense', 'income'] as const).map((t) => (
@@ -285,10 +286,14 @@ export default function TransactionModal({
               {error}
             </p>
           )}
+        </div>
 
+        {/* 保存ボタン — 常に画面下部に固定 */}
+        <div className="flex-shrink-0 border-t border-border/50 px-5 py-4">
           <Button type="submit" className="w-full" disabled={loading}>
             {loading ? '保存中...' : editTransaction ? '更新する' : '追加する'}
           </Button>
+        </div>
         </form>
       </div>
     </>
